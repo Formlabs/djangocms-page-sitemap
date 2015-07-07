@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
 from cms.sitemaps import CMSSitemap
+from django.contrib.sites.models import Site
+from django.db.models import Q
 
+from cms.models import Title
 from .models import PageSitemapProperties
 from .settings import PAGE_SITEMAP_CACHE
 from .utils import get_cache_key
@@ -34,3 +37,11 @@ class ExtendedSitemap(CMSSitemap):
                 return title.page.pagesitemapproperties.changefreq
             except PageSitemapProperties.DoesNotExist:
                 return self.default_changefreq
+
+    def items(self):
+        all_titles = Title.objects.public().filter(
+                    Q(redirect='') | Q(redirect__isnull=True),
+                    Q(page__pagesitemapproperties__exclude=False) | Q(page__pagesitemapproperties__exclude__isnull=True),
+                    page__login_required=False,
+                    page__site=Site.objects.get_current())
+        return all_titles

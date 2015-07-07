@@ -15,9 +15,13 @@ from .settings import PAGE_SITEMAP_CHANGEFREQ
 
 @python_2_unicode_compatible
 class PageSitemapProperties(PageExtension):
+    exclude = models.BooleanField(default=False)
     changefreq = models.CharField(_(u'Change frequency'), max_length=20,
+                                  blank=True, null=True,
                                   choices=PAGE_SITEMAP_CHANGEFREQ.items())
     priority = models.DecimalField(_(u'Priority'), decimal_places=1,
+                                   blank=True,
+                                   null=True,
                                    max_digits=2,
                                    validators=[MinValueValidator(0), MaxValueValidator(1)])
 
